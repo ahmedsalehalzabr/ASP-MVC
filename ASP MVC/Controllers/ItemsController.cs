@@ -1,6 +1,7 @@
 ﻿using ASP_MVC.Data;
 using ASP_MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ASP_MVC.Controllers
 {
@@ -20,6 +21,7 @@ namespace ASP_MVC.Controllers
             return View(itemsList);
         }
 
+        //GET
         public IActionResult New()
         {
             return View();
@@ -29,6 +31,11 @@ namespace ASP_MVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult New(Item item)
         {
+
+            if(item.Name == "100")
+            {
+                ModelState.AddModelError("Name", "Name can not equal 100");
+            }
            if(ModelState.IsValid)
             {
                 _db.Items.Add(item);
@@ -37,5 +44,81 @@ namespace ASP_MVC.Controllers
             }
            else { return View(item); }
         }
+
+        //GET
+        public IActionResult Edit(int? Id)
+        {
+            if (Id == null || Id == 0)
+            {
+                return NotFound(); 
+            }
+            var item = _db.Items.Find(Id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return View(item);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Item item)
+        {
+
+            if (item.Name == "100")
+            {
+                ModelState.AddModelError("Name", "Name can not equal 100");
+            }
+            if (ModelState.IsValid)
+            {
+                _db.Items.Update(item);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else { return View(item); }
+        }
+
+        //GET
+        public IActionResult Delete(int? Id)
+        {
+            if (Id == null || Id == 0)
+            {
+                return NotFound();
+            }
+            var item = _db.Items.Find(Id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return View(item);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] 
+        public IActionResult DeleteItem(int? Id)
+        {
+            var item = _db.Items.Find(Id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+        
+                _db.Items.Remove(item);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+          
+        }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Delete(Item item)
+        //{
+
+
+        //    _db.Items.Remove(item);
+        //    _db.SaveChanges();
+        //    return RedirectToAction("Index");
+
+        //}
     }
 }
